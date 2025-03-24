@@ -1,7 +1,11 @@
 package com.ces3.eventosdeportivos.DAO;
 
-import java.util.List;
+import lombok.*;
 
+import java.util.List;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EquipoDAO {
     private int id;
     private String nombre;
