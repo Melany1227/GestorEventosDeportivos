@@ -2,6 +2,7 @@ package com.ces3.eventosdeportivos.DAO;
 
 import lombok.*;
 
+import java.util.Date;
 import java.util.List;
 @Data
 @NoArgsConstructor
@@ -9,7 +10,7 @@ import java.util.List;
 public class EventoDAO {
     private int id;
     private String nombre;
-    private String fecha;
+    private Date fecha;
     private String lugar;
     private String deporte;
     private List<Integer> equiposParticipantes;

@@ -11,7 +11,10 @@ import com.ces3.eventosdeportivos.DAO.EquipoDAO;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -33,19 +36,26 @@ public class EquipoServlt extends HttpServlet {
         String nombre = request.getParameter("nombre");
         String deporte = request.getParameter("deporte");
         String ciudad = request.getParameter("ciudad");
-        String fechaFundacion = request.getParameter("fechaFundacion");
+        String fechaStr = request.getParameter("fechaFundacion");
         String logo = request.getParameter("logo");
         List<JugadorDAO> jugadore = new ArrayList<>();
         String jugadores = request.getParameter("jugadores");
 
-        //Por query params
-        if (nombre != null && deporte != null && ciudad != null && fechaFundacion != null && logo != null) {
+        SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
+
+        if (nombre != null && deporte != null && ciudad != null && fechaStr != null && logo != null) {
             EquipoDAO nuevoEquipo = new EquipoDAO();
             nuevoEquipo.setId(equipoCounter++);
             nuevoEquipo.setNombre(nombre);
             nuevoEquipo.setDeporte(deporte);
             nuevoEquipo.setCiudad(ciudad);
-            nuevoEquipo.setFechaFundacion(fechaFundacion);
+
+            try {
+                Date fechaFundacion = formato.parse(fechaStr);
+                nuevoEquipo.setFechaFundacion(fechaFundacion);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             nuevoEquipo.setLogo(logo);
 
             for (EquipoDAO equipo : equipos) {
@@ -72,7 +82,7 @@ public class EquipoServlt extends HttpServlet {
             nombre = jsonObject.getString("nombre");
             deporte = jsonObject.getString("deporte");
             ciudad = jsonObject.getString("ciudad");
-            fechaFundacion = jsonObject.getString("fechaFundacion");
+            fechaStr = jsonObject.getString("fechaFundacion");
             logo = jsonObject.getString("logo");
 
             EquipoDAO nuevoEquipo = new EquipoDAO();
@@ -80,7 +90,14 @@ public class EquipoServlt extends HttpServlet {
             nuevoEquipo.setNombre(nombre);
             nuevoEquipo.setDeporte(deporte);
             nuevoEquipo.setCiudad(ciudad);
-            nuevoEquipo.setFechaFundacion(fechaFundacion);
+
+            try {
+                Date fechaFundacion = formato.parse(fechaStr); // Convertir String a Date
+                nuevoEquipo.setFechaFundacion(fechaFundacion);
+            } catch (ParseException e) {
+                e.printStackTrace(); // Manejo de error si el formato es incorrecto
+            }
+
             nuevoEquipo.setLogo(logo);
 
             for (EquipoDAO equipo : equipos) {
