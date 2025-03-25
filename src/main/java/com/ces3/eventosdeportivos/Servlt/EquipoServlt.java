@@ -25,6 +25,7 @@ public class EquipoServlt extends HttpServlet {
     public String message;
     public List<EquipoDAO> equipos = new ArrayList<>();
     private static int equipoCounter = 1;
+    private final List<JugadorDAO> jugadoresRegistrados = new ArrayList<>();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSONArray jsonArray = new JSONArray(equipos);
@@ -38,12 +39,38 @@ public class EquipoServlt extends HttpServlet {
         String ciudad = request.getParameter("ciudad");
         String fechaStr = request.getParameter("fechaFundacion");
         String logo = request.getParameter("logo");
-        List<JugadorDAO> jugadore = new ArrayList<>();
         String jugadores = request.getParameter("jugadores");
 
         SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
 
         if (nombre != null && deporte != null && ciudad != null && fechaStr != null && logo != null) {
+
+            if(jugadores != null){
+                List<Integer> jugadoresIds = new ArrayList<>();
+                for (String idStr : jugadores.split(",")) {
+                    try {
+                        jugadoresIds.add(Integer.parseInt(idStr.trim()));
+                    } catch (NumberFormatException e) {
+                        response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Formato de ID de jugador inválido");
+                        return;
+                    }
+                }
+
+                // Validar si todos los jugadores existen
+                List<Integer> jugadoresNoExistentes = new ArrayList<>();
+                for (Integer id : jugadoresIds) {
+                    if (!jugadoresRegistrados.contains(id)) {
+                        jugadoresNoExistentes.add(id);
+                    }
+                }
+
+                if (!jugadoresNoExistentes.isEmpty()) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            "Los siguientes jugadores no existen: " + jugadoresNoExistentes);
+                    return;
+                }
+            }
+
             EquipoDAO nuevoEquipo = new EquipoDAO();
             nuevoEquipo.setId(equipoCounter++);
             nuevoEquipo.setNombre(nombre);
@@ -84,6 +111,7 @@ public class EquipoServlt extends HttpServlet {
             ciudad = jsonObject.getString("ciudad");
             fechaStr = jsonObject.getString("fechaFundacion");
             logo = jsonObject.getString("logo");
+            JSONArray jugadoresArray = jsonObject.optJSONArray("jugadores");
 
             EquipoDAO nuevoEquipo = new EquipoDAO();
             nuevoEquipo.setId(equipoCounter++);
@@ -95,10 +123,34 @@ public class EquipoServlt extends HttpServlet {
                 Date fechaFundacion = formato.parse(fechaStr); // Convertir String a Date
                 nuevoEquipo.setFechaFundacion(fechaFundacion);
             } catch (ParseException e) {
-                e.printStackTrace(); // Manejo de error si el formato es incorrecto
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Formato de fecha incorrecto");
+                e.printStackTrace();
             }
 
             nuevoEquipo.setLogo(logo);
+
+            List<Integer> jugadoresIds = new ArrayList<>();
+            if (jugadoresArray != null) {
+                for (int i = 0; i < jugadoresArray.length(); i++) {
+                    jugadoresIds.add(jugadoresArray.getInt(i));
+                }
+            }
+
+            nuevoEquipo.setJugadores(jugadoresIds);
+
+            List<Integer> jugadoresNoEncontrados = new ArrayList<>();
+            for (int jugadorId : jugadoresIds) {
+                boolean existe = jugadoresRegistrados.stream().anyMatch(j -> j.getId() == jugadorId);
+                if (!existe) {
+                    jugadoresNoEncontrados.add(jugadorId);
+                }
+            }
+
+            if (!jugadoresNoEncontrados.isEmpty()) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        "Los siguientes jugadores no existen: " + jugadoresNoEncontrados);
+                return;
+            }
 
             for (EquipoDAO equipo : equipos) {
                 if (equipo.getNombre().equalsIgnoreCase(nombre) && equipo.getDeporte().equalsIgnoreCase(deporte)) {

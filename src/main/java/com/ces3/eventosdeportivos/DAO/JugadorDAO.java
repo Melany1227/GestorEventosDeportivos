@@ -8,13 +8,13 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JugadorDAO {
-    private int id;
+    private Integer id;
     private String nombre;
     private String apellido;
     private Date fechaNacimiento;
     private String nacionalidad;
     private String posicion;
-    private int numero;
-    private int equipoId;
-    private boolean estadoActivo;
+    private Integer numero;
+    private Integer equipoId;
+    private Boolean estadoActivo;
 }

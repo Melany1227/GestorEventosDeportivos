@@ -8,7 +8,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EquipoDAO {
-    private int id;
+    private Integer id;
     private String nombre;
     private String deporte;
     private String ciudad;

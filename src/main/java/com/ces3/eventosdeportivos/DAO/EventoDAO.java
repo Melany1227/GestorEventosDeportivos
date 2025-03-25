@@ -8,13 +8,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventoDAO {
-    private int id;
+    private Integer id;
     private String nombre;
     private Date fecha;
     private String lugar;
     private String deporte;
     private List<Integer> equiposParticipantes;
-    private int capacidad;
-    private int entradasVendidas;
+    private Integer capacidad;
+    private Integer entradasVendidas;
     private EstadoEvento estado;
 }
