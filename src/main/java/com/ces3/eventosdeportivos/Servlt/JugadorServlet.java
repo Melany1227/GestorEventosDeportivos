@@ -21,7 +21,7 @@ import java.util.List;
 @WebServlet(name = "jugadores", urlPatterns = "/jugadores")
 public class JugadorServlet extends HttpServlet {
     private static List<JugadorDAO> jugadores = new ArrayList<>();
-    private static int jugadorCounter = 1;
+    private static Integer jugadorCounter = 1;
     private static final SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -34,7 +34,6 @@ public class JugadorServlet extends HttpServlet {
         String equipoIdStr = request.getParameter("equipoId");
         String estadoActivoStr = request.getParameter("estadoActivo");
 
-        // ✅ Opción 1: Si los datos vienen en Query Params
         if (nombre != null && apellido != null && fechaStr != null && nacionalidad != null
                 && posicion != null && numeroStr != null && equipoIdStr != null && estadoActivoStr != null) {
             try {
@@ -63,7 +62,6 @@ public class JugadorServlet extends HttpServlet {
             }
         }
 
-        // ✅ Opción 2: Si los datos vienen en JSON (Body)
         BufferedReader reader = request.getReader();
         StringBuilder json = new StringBuilder();
         String line;
@@ -80,9 +78,9 @@ public class JugadorServlet extends HttpServlet {
                 String jsonFechaNacimiento = jsonObject.getString("fechaNacimiento");
                 String jsonNacionalidad = jsonObject.getString("nacionalidad");
                 String jsonPosicion = jsonObject.getString("posicion");
-                int jsonNumero = jsonObject.getInt("numero");
-                int jsonEquipoId = jsonObject.getInt("equipoId");
-                boolean jsonEstadoActivo = jsonObject.getBoolean("estadoActivo");
+                Integer jsonNumero = jsonObject.getInt("numero");
+                Integer jsonEquipoId = jsonObject.getInt("equipoId");
+                Boolean jsonEstadoActivo = jsonObject.getBoolean("estadoActivo");
 
                 Date fechaNacimiento = formato.parse(jsonFechaNacimiento);
 
