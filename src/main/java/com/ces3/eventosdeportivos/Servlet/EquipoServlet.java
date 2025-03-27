@@ -1,4 +1,4 @@
-package com.ces3.eventosdeportivos.Servlt;
+package com.ces3.eventosdeportivos.Servlet;
 
 import com.ces3.eventosdeportivos.DAO.JugadorDAO;
 import jakarta.servlet.ServletException;
@@ -10,7 +10,6 @@ import com.ces3.eventosdeportivos.DAO.EquipoDAO;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,16 +20,52 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 @WebServlet(name = "Servlt", urlPatterns = "/equipos")
-public class EquipoServlt extends HttpServlet {
+public class EquipoServlet extends HttpServlet {
     public String message;
-    public List<EquipoDAO> equipos = new ArrayList<>();
+    protected static List<EquipoDAO> equipos = new ArrayList<>();
     private static int equipoCounter = 1;
-    private final List<JugadorDAO> jugadoresRegistrados = new ArrayList<>();
+    private final List<JugadorDAO> jugadoresRegistrados = JugadorServlet.jugadores;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        JSONArray jsonArray = new JSONArray(equipos);
+        JSONArray equiposArray = new JSONArray();
+
+        for (EquipoDAO equipo : equipos) {
+            JSONObject equipoJson = new JSONObject();
+            equipoJson.put("id", equipo.getId());
+            equipoJson.put("nombre", equipo.getNombre());
+            equipoJson.put("deporte", equipo.getDeporte());
+            equipoJson.put("ciudad", equipo.getCiudad());
+            equipoJson.put("fechaFundacion", new SimpleDateFormat("yyyy-MM-dd").format(equipo.getFechaFundacion()));
+            equipoJson.put("logo", equipo.getLogo());
+
+            JSONArray jugadoresArray = new JSONArray();
+            for (int jugadorId : equipo.getJugadores()) {
+                JugadorDAO jugador = buscarJugadorPorId(jugadorId);
+                if (jugador != null) {
+                    JSONObject jugadorJson = new JSONObject();
+                    jugadorJson.put("id", jugador.getId());
+                    jugadorJson.put("nombre", jugador.getNombre());
+                    jugadorJson.put("apellido", jugador.getApellido());
+                    jugadorJson.put("posicion", jugador.getPosicion());
+                    jugadoresArray.put(jugadorJson);
+                }
+            }
+
+            equipoJson.put("jugadores", jugadoresArray);
+            equiposArray.put(equipoJson);
+        }
+
         response.setContentType("application/json");
-        response.getWriter().write(jsonArray.toString());
+        response.getWriter().write(equiposArray.toString());
+    }
+
+    private JugadorDAO buscarJugadorPorId(int id) {
+        for (JugadorDAO jugador : jugadoresRegistrados) {
+            if (jugador.getId() == id) {
+                return jugador;
+            }
+        }
+        return null;
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -56,7 +91,6 @@ public class EquipoServlt extends HttpServlet {
                     }
                 }
 
-                // Validar si todos los jugadores existen
                 List<Integer> jugadoresNoExistentes = new ArrayList<>();
                 for (Integer id : jugadoresIds) {
                     if (!jugadoresRegistrados.contains(id)) {
@@ -132,7 +166,10 @@ public class EquipoServlt extends HttpServlet {
             List<Integer> jugadoresIds = new ArrayList<>();
             if (jugadoresArray != null) {
                 for (int i = 0; i < jugadoresArray.length(); i++) {
-                    jugadoresIds.add(jugadoresArray.getInt(i));
+                    //JugadorDAO jugador = buscarJugadorPorId(jugadoresArray.getInt(i));
+                   // if (jugador != null) {
+                        jugadoresIds.add(jugadoresArray.getInt(i));
+                    //}
                 }
             }
 
