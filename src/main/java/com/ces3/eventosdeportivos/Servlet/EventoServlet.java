@@ -17,7 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@WebServlet(name = "eventos", urlPatterns = "/eventos")
+@WebServlet(name = "eventos", urlPatterns = "/eventos/*")
 public class EventoServlet extends HttpServlet {
     private static List<EventoDAO> eventos = new ArrayList<>();
     private static int eventoCounter = 1;
